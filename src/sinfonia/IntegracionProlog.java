@@ -18,44 +18,41 @@ public class IntegracionProlog {
     public IntegracionProlog() {
         try {
         	
-            // 1) Buscar entrenamientos.pl en el classpath
+            // Busqueda de archivo .pl
             URL resource = IntegracionProlog.class
                     .getClassLoader()
                     .getResource("entrenamientos.pl");
 
-            System.out.println("DEBUG recurso entrenamientos.pl = " + resource);
 
             if (resource == null) {
-                throw new IllegalStateException("No se encontró entrenamientos.pl en el classpath");
+                throw new IllegalStateException("No se encontró se encontró el archivo .pl");
             }
+            
+            //System.out.println(System.getProperty("java.class.path"));
 
-
-            // 2) Convertir a ruta de archivo y normalizar slashes
+            // Normalizacion del PATH
             String path = Paths.get(resource.toURI())
                     .toString()
                     .replace("\\", "/");
 
-            System.out.println("DEBUG ruta Prolog entrenamientos.pl = " + path);
-
-            // 3) Hacer consult(Ruta) en Prolog
+            // Consulta
             Query q = new Query(
                     "consult",
                     new Term[]{ new Atom(path) }
             );
 
             boolean ok = q.hasSolution();
-            System.out.println("DEBUG resultado consult('" + path + "') = " + ok);
 
             if (!ok) {
-                throw new IllegalStateException("No se pudo consultar entrenamientos.pl en: " + path);
+                throw new IllegalStateException("No se pudo consultar el archivo .pl en: " + path);
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Error inicializando Prolog", e);
+            throw new RuntimeException("Error abriendo prolog", e);
         }
     }
 
-    private String normalizarRol(String rol) {
+    private String normalizarRol(String rol) {		//Es necesario normalizar para evitar errores en la ejecución del script de Prolog debido a caracteres inválidos.
         if (rol == null) return "";
         return rol.toLowerCase()
                 .replace(" ", "_")
@@ -67,41 +64,36 @@ public class IntegracionProlog {
     }
 
     private void limpiarHechosPrevios() {
-        // Borramos los hechos dinámicos usados por este servicio
+        // Limpiamos los hechos previos
         new Query("retractall(requiere(_, _))").hasSolution();
         new Query("retractall(tiene_base(_, _))").hasSolution();
     }
 
     public int entrenamientosMinimos(List<Cancion> canciones, List<ArtistaBase> artistasBase) {
 
-        // 1) Limpiar hechos viejos en Prolog
         limpiarHechosPrevios();
 
-        // 2) Construir requiere(Rol, CantMaxima)
-        //    CantMaxima = máxima cantidad simultánea de ese rol en alguna canción
-        Map<String, Integer> maxRequeridosPorRol = new HashMap<>();
+        
+        Map<String, Integer> maxXrol = new HashMap<>();
 
         for (Cancion c : canciones) {
-            // Asumiendo Map<String, Integer> getRolesRequeridos()
             for (String r : c.getRolesRequeridos()) {
                 String rolNorm = normalizarRol(r);
-                maxRequeridosPorRol.merge(rolNorm, 1, Math::max);
+                maxXrol.merge(rolNorm, 1, Math::max);
             }
         }
 
-        // 3) Construir tiene_base(Rol, CantBase)
-        //    CantBase = cuántos artistas base saben ese rol
-        Map<String, Integer> basePorRol = new HashMap<>();
+        
+        Map<String, Integer> artDiscograficaXRol = new HashMap<>();
 
         for (ArtistaBase a : artistasBase) {
             for (String rol : a.getRolesHistoricos()) {
                 String rolNorm = normalizarRol(rol);
-                basePorRol.merge(rolNorm, 1, Integer::sum);
+                artDiscograficaXRol.merge(rolNorm, 1, Integer::sum);
             }
         }
 
-        // 4) Assertar requiere/2 en Prolog
-        for (Map.Entry<String, Integer> e : maxRequeridosPorRol.entrySet()) {
+        for (Map.Entry<String, Integer> e : maxXrol.entrySet()) {
             String rol = e.getKey();
             int cantMax = e.getValue();
 
@@ -113,8 +105,7 @@ public class IntegracionProlog {
             assertQ.hasSolution();
         }
 
-        // 5) Assertar tiene_base/2 en Prolog
-        for (Map.Entry<String, Integer> e : basePorRol.entrySet()) {
+        for (Map.Entry<String, Integer> e : artDiscograficaXRol.entrySet()) {
             String rol = e.getKey();
             int cantBase = e.getValue();
 
@@ -126,7 +117,6 @@ public class IntegracionProlog {
             assertQ.hasSolution();
         }
 
-        // 6) Consultar min_entrenamientos(N).
         Variable N = new Variable("N");
         Query q = new Query(
                 "min_entrenamientos",
@@ -145,9 +135,7 @@ public class IntegracionProlog {
         return ((org.jpl7.Integer) nTerm).intValue();
     }
 
-    public double costoTotalEntrenamientos(List<Cancion> canciones,
-                                           List<ArtistaBase> artistasBase,
-                                           double costoUnitario) {
+    public double costoTotalEntrenamientos(List<Cancion> canciones, List<ArtistaBase> artistasBase, double costoUnitario) {
         int n = entrenamientosMinimos(canciones, artistasBase);
         return n * costoUnitario;
     }
