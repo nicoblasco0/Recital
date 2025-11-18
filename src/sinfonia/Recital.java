@@ -10,7 +10,7 @@ import java.util.Set;
 
 /*
  Clase orquestadora principal.
- Contiene la lógica para gestionar el recital,
+ Contiene la logica para gestionar el recital,
  los artistas y las contrataciones.
  */
 public class Recital {
@@ -19,13 +19,13 @@ public class Recital {
     private List<ArtistaBase> artistasBase;
     private List<ArtistaExterno> artistasCandidatos;
     
-    // Esta lista guardará todos los "contratos" (Asignacion) que hagamos.
+    // Esta lista guardara todos los "contratos" (Asignacion) que hagamos.
     private List<Contrato> contrataciones;
 
     /**
       Constructor para inicializar el Recital.
       @param setlist La lista de canciones a tocar.
-      @param artistasBase Los artistas de la discográfica.
+      @param artistasBase Los artistas de la discografica.
       @param artistasCandidatos Los artistas externos disponibles para contratar.
      */
     public Recital(List<Cancion> setlist, List<ArtistaBase> artistasBase, List<ArtistaExterno> artistasCandidatos) {
@@ -33,12 +33,20 @@ public class Recital {
         this.artistasBase = artistasBase;
         this.artistasCandidatos = artistasCandidatos;
         
-        // Inicializamos la lista de contrataciones como vacía.
+        // Inicializamos la lista de contrataciones
         this.contrataciones = new ArrayList<>();
     }
 
     
     // --- GETTERS ---
+    
+    /**
+     Devuelve la lista de artistas base.
+     @return La lista de artistas base.
+     */
+    public List<ArtistaBase> getArtistasBase() {
+        return this.artistasBase;
+    }
     
     /**
      Devuelve la lista de candidatos externos.
@@ -79,8 +87,8 @@ public class Recital {
     // --- METODOS DE CONSULTA ---
 
     /**
-     Calcula los roles (con cantidad) que faltan para cubrir una canción específica.
-     @param cancion La canción a verificar.
+     Calcula los roles (con cantidad) que faltan para cubrir una cancion especifica.
+     @param cancion La cancion a verificar.
      @return Un Mapa donde la clave es el rol (String) y el valor la cantidad (Integer) de
      músicos que faltan para ese rol.
      */
@@ -94,7 +102,7 @@ public class Recital {
             //Buscamos el primer rol que este artista pueda cubrir y que se necesite
             for (String rolQueSabeTocar : artistaBase.getRolesHistoricos()) {
                 
-                // Verificamos si este rol todavía se necesita
+                // Verificamos si este rol todavia se necesita
                 int cantidadFaltante = rolesFaltantes.getOrDefault(rolQueSabeTocar, 0);
                 
                 if (cantidadFaltante > 0) {
@@ -110,7 +118,7 @@ public class Recital {
         // Restamos los roles ya cubiertos por artistasExternos
         for (Contrato contrato : this.contrataciones) {
             
-            // Verificamos si el contrato es para esta canción
+            // Verificamos si el contrato es para esta cancion
             if (contrato.getCancion().equals(cancion)) {
                 String rolAsignado = contrato.getRolAsignado();
                 int cantidadFaltante = rolesFaltantes.getOrDefault(rolAsignado, 0);
@@ -151,12 +159,12 @@ public class Recital {
             // Usamos getRolesFaltantesCancion(cancion).
             Map<String, Integer> faltantesCancion = this.getRolesFaltantesCancion(cancion);
     
-            // Iteramos por cada entrada (par clave-valor) del mapa de faltantes de la canción
+            // Iteramos por cada entrada (par clave-valor) del mapa de faltantes de la cancion
             for (Map.Entry<String, Integer> entrada : faltantesCancion.entrySet()) {
                 String rol = entrada.getKey();
                 int cantidad = entrada.getValue();
 
-                // Obtenemos la cantidad que ya teníamos acumulada para este rol (o 0 si era la primera vez)
+                // Obtenemos la cantidad que ya teniamos acumulada para este rol (o 0 si era la primera vez)
                 int cantidadActual = faltantesGlobal.getOrDefault(rol, 0);
                 
                 // Guardamos la nueva suma total para ese rol
@@ -170,15 +178,15 @@ public class Recital {
     // --- METODOS DE ACCION ---
 
     /**
-     Contrata artistas para una canción específica, optimizando por costo (Greedy).
-     @param cancion La canción para la cual contratar.
+     Contrata artistas para una cancion especifica, optimizando por costo (Greedy).
+     @param cancion La cancion para la cual contratar.
      */
     public void contratarParaCancion(Cancion cancion) {
 
         //Usamos getRolesFaltantesCancion(cancion) que ya excluye Artistas Base y contratos previos.
         Map<String, Integer> rolesFaltantes = this.getRolesFaltantesCancion(cancion);
         
-        System.out.println("\nIniciando contratación para '" + cancion.getTitulo() + "'...");
+        System.out.println("\nIniciando contratacion para '" + cancion.getTitulo() + "'...");
         
         // Iteramos por cada tipo de rol faltante
         for (Map.Entry<String, Integer> entrada : rolesFaltantes.entrySet()) {
@@ -190,7 +198,7 @@ public class Recital {
                 
                 System.out.println("\n\t-Buscando artista para " + rol + " (" + (i+1) + "/" + cantidadARequerir + ")...");
                 
-                // 3. Buscar en 'artistasCandidatos' al artista MÁS BARATO
+                // Buscamos en 'artistasCandidatos' al artista mas barato
                 ArtistaExterno artistaMasBarato = null;
                 double costoMinimo = Double.MAX_VALUE;
 
@@ -246,16 +254,16 @@ public class Recital {
                 } else {
                     // Si no se encuentra artista, generamos un error.
                     System.err.println("¡ERROR! No se encontraron artistas disponibles para el rol '" + 
-                                       rol + "' en la canción '" + cancion.getTitulo() + "'.");
+                                       rol + "' en la cancion '" + cancion.getTitulo() + "'.");
                     
-                    // Lanzamos una excepción para detener la operación.
+                    // Lanzamos una excepcion para detener la operacion.
                     throw new RuntimeException("Faltan artistas para " + rol + " en " + cancion.getTitulo());
                 }
                 
             } 
             
         } 
-        System.out.println("\nContratación finalizada para '" + cancion.getTitulo() + "'");  
+        System.out.println("\nContratacion finalizada para '" + cancion.getTitulo() + "'");  
     }
     
     /**
@@ -263,7 +271,7 @@ public class Recital {
      @param artista El artista a verificar.
      @return El número de canciones únicas.
      */
-    private int getCancionesAsignadas(ArtistaExterno artista) {
+    public int getCancionesAsignadas(ArtistaExterno artista) {
         Set<Cancion> cancionesUnicas = new HashSet<>();
         
         for (Contrato contrato : this.contrataciones) {
@@ -276,10 +284,10 @@ public class Recital {
     
     /**
      Helper para verificar si un artista ya tiene un contrato
-     para un rol en una canción específica.
+     para un rol en una cancion especifica.
      @param artista El artista a verificar.
-     @param cancion La canción a verificar.
-     @return true si ya tiene un contrato en esa canción, false si no.
+     @param cancion La cancion a verificar.
+     @return true si ya tiene un contrato en esa cancion, false si no.
      */
     private boolean estaContratadoParaCancion(ArtistaExterno artista, Cancion cancion) {
         for (Contrato contrato : this.contrataciones) {
@@ -317,18 +325,18 @@ public class Recital {
                 cancionesExitosas++;
                 
             } catch (RuntimeException e) {
-                // Si falla la contratación de una canción (ej. no hay artistas),
+                // Si falla la contratacion de una cancion (ej. no hay artistas),
                 // informamos el error y continuamos con la siguiente.
                 System.err.println("Error al contratar para '" + cancion.getTitulo() + 
                                    "': " + e.getMessage());
-                System.err.println("Continuando con la siguiente canción...");
+                System.err.println("Continuando con la siguiente cancion...");
                 cancionesFallidas++;
             }
         }
         
         double costoDespues = this.getCostoTotalContratos();
         
-        System.out.println("\n===== Contratación del recital finalizada =====");
+        System.out.println("\n===== Contratacion del recital finalizada =====");
         System.out.println("Resumen:");
         System.out.println("-" + cancionesExitosas + " canciones procesadas.");
         if (cancionesFallidas > 0) {
@@ -369,17 +377,70 @@ public class Recital {
             
         } else {
             // Manejar el caso de que el artista no exista
-            System.err.println("Error: No se encontró ningún artista candidato con el nombre '" + 
+            System.err.println("Error: No se encontro ningún artista candidato con el nombre '" + 
                                nombreArtista + "'.");
+        }
+    }
+    
+    /**
+     Elimina el contrato y si era el último
+     contrato de ese artista, resetea su estado.
+     @param contratoAQuitar El contrato especifico a eliminar.
+     */
+    public void quitarContrato(Contrato contratoAQuitar) {
+        ArtistaExterno artista = contratoAQuitar.getArtista();
+        
+        if (this.contrataciones.remove(contratoAQuitar)) {
+            System.out.println("\nContrato eliminado: " + artista.getNombre() + 
+                               " en '" + contratoAQuitar.getCancion().getTitulo() + 
+                               "' (Rol: " + contratoAQuitar.getRolAsignado() + ")");
+            
+            // Verificamos si este era el último contrato del artista.
+            int cancionesRestantes = this.getCancionesAsignadas(artista);
+            
+            if (cancionesRestantes == 0) {
+                artista.setNoContratado();
+            }
+        } else {
+            System.err.println("Error: No se pudo encontrar el contrato en la lista.");
+        }
+    }
+    
+    /**
+     * Elimina todos los contratos de un artista.
+     * @param artista El artista a quitar.
+     */
+    public void quitarTodosLosContratosDeArtista(ArtistaExterno artista) {
+
+        Iterator<Contrato> iterador = this.contrataciones.iterator();
+        int contratosEliminados = 0;
+
+        while (iterador.hasNext()) {
+            Contrato contrato = iterador.next();
+            if (contrato.getArtista().equals(artista)) {
+                iterador.remove(); 
+                contratosEliminados++;
+            }
+        }
+
+        if (contratosEliminados > 0) {
+            // Si eliminamos al menos un contrato, reseteamos el estado del artista
+            artista.setNoContratado();
+            System.out.println("Se eliminaron " + contratosEliminados + 
+                               " contratos de " + artista.getNombre() + ".");
+            System.out.println("El artista ahora esta disponible y puede ser entrenado.");
+        } else {
+
+            System.out.println(artista.getNombre() + " no tenia contratos para eliminar.");
         }
     }
 
     
-    // --- MÉTODOS DE REPORTE ---
+    // --- METODOS DE REPORTE ---
 
     /**
      Imprime por consola la lista de todos los artistas externos contratados,
-     el rol, la canción y el costo pagado. También muestra un total.
+     el rol, la cancion y el costo pagado. Tambien muestra un total.
      */
     public void listarArtistasContratados() {
         System.out.println("\n===== Listado de Artistas Contratados =====\n");
@@ -397,7 +458,7 @@ public class Recital {
         for (Contrato contrato : this.contrataciones) {
             System.out.println(
                 "- Artista: " + contrato.getArtista().getNombre() + 
-                "\n    Canción: " + contrato.getCancion().getTitulo() + 
+                "\n    Cancion: " + contrato.getCancion().getTitulo() + 
                 "\n    Rol: " + contrato.getRolAsignado() + 
                 "\n    Costo: $" + String.format("%.2f", contrato.getCostoPagado()) 
             );
@@ -410,20 +471,20 @@ public class Recital {
     }
 
     /**
-     Imprime por consola el estado de cada canción del setlist
-     (completa o incompleta) y, si está incompleta, detalla
+     Imprime por consola el estado de cada cancion del setlist
+     (completa o incompleta) y, si esta incompleta, detalla
      los roles que aún faltan por cubrir.
      */
     public void listarEstadoCanciones() {
-        System.out.println("\n===== Estado de Canciones del Recital =====\n");
+        System.out.println("\n===== Estado de Canciones del Recital =====");
         
         // Iteramos por 'this.setlist'.
         for (Cancion cancion : this.setlist) {
             
-            // Por cada canción, se llama a getRolesFaltantesCancion(cancion).
+            // Por cada cancion, se llama a getRolesFaltantesCancion(cancion).
             Map<String, Integer> rolesFaltantes = this.getRolesFaltantesCancion(cancion);
             
-            // Si el mapa de roles faltantes está vacío, se imprime "Completa".
+            // Si el mapa de roles faltantes esta vacio, se imprime "Completa".
             if (rolesFaltantes.isEmpty()) {
                 System.out.println("\n- " + cancion.getTitulo() + ": [COMPLETA]");
             } else {
@@ -436,7 +497,7 @@ public class Recital {
                 }
             }
         }
-        System.out.println("===========================================");
+        System.out.println("\n===========================================");
     }
 
 }

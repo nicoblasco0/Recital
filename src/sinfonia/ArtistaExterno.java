@@ -53,12 +53,20 @@ public class ArtistaExterno extends Artista {
 
     /*
      Marca al artista como contratado.
-     Esto impide que sea entrenado.
      */
     public void setYaContratado() {
         this.yaContratado = true;
     }
 
+    /*
+     Marca al artista como no contratado.
+     */
+    public void setNoContratado() {
+        this.yaContratado = false;
+        
+    }
+
+    
     /**
      Entrena al artista para un nuevo rol, si no está contratado.
      Incrementa su costo y añade el rol a su historial.
