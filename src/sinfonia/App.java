@@ -276,9 +276,9 @@ public class App {
     *UI para la opcion 8: Pregunta de Prolog
     */
     private static void uiPreguntaProlog() {
-        System.out.println("--- Integración con Prolog ---");
-        System.out.println("Esta funcionalidad requiere la integración con JPL (Java Prolog Library).");
-        System.out.println("La lógica de Java debe recolectar los datos y pasarlos a un predicado de Prolog.");
+    	System.out.println("--- Integración con Prolog ---");
+        IntegracionProlog integracionProlog = new IntegracionProlog();
+		integracionProlog.entrenamientosMinimos(recital.getSetlist(), recital.getArtistasBase());
     }
     
     /**
