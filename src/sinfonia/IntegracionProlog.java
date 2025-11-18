@@ -51,9 +51,6 @@ public class IntegracionProlog {
             }
 
         } catch (Exception e) {
-        	System.out.println(System.getProperty("java.class.path"));
-
-        	e.printStackTrace();
             throw new RuntimeException("Error inicializando Prolog", e);
         }
     }
@@ -88,7 +85,7 @@ public class IntegracionProlog {
             // Asumiendo Map<String, Integer> getRolesRequeridos()
             for (String r : c.getRolesRequeridos()) {
                 String rolNorm = normalizarRol(r);
-                maxRequeridosPorRol.merge(rolNorm, 1, Integer::sum);
+                maxRequeridosPorRol.merge(rolNorm, 1, Math::max);
             }
         }
 

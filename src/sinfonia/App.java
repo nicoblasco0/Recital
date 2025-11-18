@@ -278,7 +278,9 @@ public class App {
     private static void uiPreguntaProlog() {
     	System.out.println("--- Integración con Prolog ---");
         IntegracionProlog integracionProlog = new IntegracionProlog();
-		integracionProlog.entrenamientosMinimos(recital.getSetlist(), recital.getArtistasBase());
+        System.out.println("Cantidad de entrenamientos minimos requeridos: " + integracionProlog.entrenamientosMinimos(recital.getSetlist(), recital.getArtistasBase()));
+		System.out.println("Costo total de entrenamientos: " + integracionProlog.costoTotalEntrenamientos(recital.getSetlist(), recital.getArtistasBase(), 10));
+		
     }
     
     /**
